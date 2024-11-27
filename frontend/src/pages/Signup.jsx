@@ -74,18 +74,16 @@ function Signup() {
         />
         <input
           type="submit"
-          value="Submit"
+          value={loading ? "Loading" : "Sign in"}
           id="submit"
           onClick={handleSubmit}
           className="border p-3 rounded-lg bg-slate-800 text-white uppercase hover:opacity-90 cursor-pointer disabled:opacity-80"
         />
       </form>
       <div className="flex gap-2 mt-5">
-        <p>Have an account</p>
+        <p>Already have an account?</p>
         <Link to={"/signin"}>
-          <span className="text-blue-700">
-            {loading ? "Loading" : "Sign in"}
-          </span>
+          <span className="text-blue-700">Sign In</span>
         </Link>
       </div>
     </div>
