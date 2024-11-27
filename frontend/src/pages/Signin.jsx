@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInError,
+  signInSuccess,
+} from "../redux/User/userSlice";
 
 function Signin() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { loading, error } = useSelector((state) => state.user);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -13,15 +20,17 @@ function Signin() {
     });
     console.log({ ...formData, [e.target.id]: e.target.value });
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!formData.email || !formData.password) {
-      setError("Please fill username or email and password field properly");
+      dispatch(
+        signInError("Please fill username or email and password field properly")
+      );
       return;
     }
-    setLoading(true);
     try {
-      setLoading(true);
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -31,28 +40,28 @@ function Signin() {
       });
       const data = await res.json();
       console.log(data);
-      if (data.success == false) {
-        setError(data.message);
+      if (data.success === false) {
+        dispatch(signInError(data.message));
       } else {
         setFormData({});
-        setError("");
+        dispatch(signInSuccess(data));
         navigate("/");
       }
-      setLoading(false);
     } catch (error) {
-      console.error(`An error occured: ${error}`);
+      dispatch(signInError(error));
     }
   };
+
   return (
     <div className="p-5">
-      <h1 className="text-3xl text-center font-semibold my-7"> Signin</h1>
+      <h1 className="text-3xl text-center font-semibold my-7">Signin</h1>
       {error && <p className="text-red-600 text-md">{error}</p>}
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="text"
           name="userName"
           id="email"
-          placeholder="username or password"
+          placeholder="Username or Email"
           className="border p-3 rounded-lg"
           onChange={handleChange}
         />
@@ -66,9 +75,9 @@ function Signin() {
         />
         <input
           type="submit"
-          value={loading ? "Loading" : "Sign in"}
+          value={loading ? "Loading..." : "Sign in"}
           id="submit"
-          onClick={handleSubmit}
+          disabled={loading}
           className="border p-3 rounded-lg bg-slate-800 text-white uppercase hover:opacity-90 cursor-pointer disabled:opacity-80"
         />
       </form>
