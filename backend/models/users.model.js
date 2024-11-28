@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    photo: {
+      type: String,
+      default:
+        "https://greekherald.com.au/wp-content/uploads/2020/07/default-avatar.png",
+    },
   },
   { timestamps: true }
 );
