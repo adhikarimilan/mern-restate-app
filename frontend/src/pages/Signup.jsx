@@ -45,7 +45,7 @@ function Signup() {
     }
   };
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7"> Signup</h1>
       {error && <p className="text-red-600 text-md">{error}</p>}
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
