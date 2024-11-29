@@ -31,7 +31,7 @@ const OAuth = () => {
         }),
       });
       const data = await login.json();
-      dispatch(signInSuccess(data));
+      dispatch(signInSuccess(data.userData));
       navigate("/");
     } catch (error) {
       console.error(`An error Occured: ${error}`);

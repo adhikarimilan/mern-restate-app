@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   signInStart,
   signInError,
   signInSuccess,
+  clearError,
 } from "../redux/User/userSlice";
 import OAuth from "../Components/OAuth";
 
@@ -13,6 +14,10 @@ function Signin() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -45,7 +50,7 @@ function Signin() {
         dispatch(signInError(data.message));
       } else {
         setFormData({});
-        dispatch(signInSuccess(data));
+        dispatch(signInSuccess(data.userData));
         navigate("/");
       }
     } catch (error) {
