@@ -105,8 +105,8 @@ const Profile = () => {
         />
         <input
           type="password"
-          id="oldPassword"
-          placeholder="Your Old Password"
+          id="currentPassword"
+          placeholder="Your Current Password"
           className="border p-3 rounded-lg"
         />
         <input
