@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { MdOutlineModeEdit } from "react-icons/md";
+import { useDispatch } from "react-redux";
+import {
+  updateUSerError,
+  updateUserStart,
+  updsateUserSuccess,
+  clearError,
+} from "../redux/User/userSlice.js";
 import {
   getDownloadURL,
   getStorage,
@@ -10,9 +17,11 @@ import {
 import { app } from "../firebase.js";
 
 const Profile = () => {
+  const dispatch = useDispatch();
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState({});
   const [photo, setPhoto] = useState(null);
   const [file, setFile] = useState(null);
 
@@ -21,6 +30,53 @@ const Profile = () => {
       handleFileUpload(file);
     }
   }, [file]);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, []);
+
+  const handleChange = (e) => {
+    dispatch(clearError());
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+    console.log({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData) {
+      dispatch(updateUSerError("No changes to update"));
+      return;
+    }
+    if (formData.currentPassword) {
+      if (!formData.newPassword) {
+        dispatch(updateUSerError("Please Enter your new password Value"));
+        return;
+      }
+      if (formData.newPassword !== formData.confirmPassword) {
+        dispatch(updateUSerError("Password Confirmation do not match!"));
+        return;
+      }
+    }
+
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success == false) {
+        dispatch(updateUSerError(data.message));
+        return;
+      }
+      dispatch(updsateUserSuccess(data));
+    } catch (error) {
+      dispatch(updateUSerError(error.message));
+    }
+  };
 
   const handleFileUpload = async (file) => {
     try {
@@ -44,6 +100,8 @@ const Profile = () => {
         () => {
           getDownloadURL(uploadFile.snapshot.ref).then((downloadUrl) => {
             setPhoto(downloadUrl);
+            setFormData({ ...formData, photo: photo });
+            handleSubmit(event);
             console.log(downloadUrl);
           });
         }
@@ -57,7 +115,7 @@ const Profile = () => {
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-3">Profile</h1>
 
-      <form className="flex flex-col gap-3">
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
         <input
           type="file"
           id="file"
@@ -79,7 +137,7 @@ const Profile = () => {
             <MdOutlineModeEdit className="text-white text-3xl font-bold" />
           </div>
         </div>
-
+        {error && <p className="text-red-500 font-bold">{error}</p>}
         {uploadProgress > 0 &&
           (uploadProgress < 100 ? (
             <h4 className="text-blue-500 text-center font-bold">
@@ -93,38 +151,43 @@ const Profile = () => {
 
         <input
           type="text"
-          value={currentUser.userName}
-          id="username"
+          defaultValue={currentUser.userName}
+          id="userName"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="email"
           id="email"
-          value={currentUser.email}
+          defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="password"
           id="currentPassword"
           placeholder="Your Current Password"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="password"
           id="newPassword"
           placeholder="Your New Password"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="password"
           id="confirmPassword"
           placeholder="Confirm Pasword"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
-          type="button"
+          type="submit"
           id="submit"
-          value="UpDaTe"
+          value={loading ? "Loading..." : "upDate"}
           className="border bg-slate-950 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 cursor-pointer text-gray-300 uppercase"
         />
         <input

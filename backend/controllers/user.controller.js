@@ -34,18 +34,23 @@ export const updateUserInfo = async (req, res, next) => {
         );
       newPassword = bcryptjs.hashSync(req.body.newPassword, 10);
     }
+    const updateFields = {
+      userName: req.body.userName,
+      email: req.body.email,
+      photo: req.body.photo,
+    };
+
+    // Add password only if newPassword is defined
+    if (newPassword) {
+      updateFields.password = newPassword;
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { _id: validUser._id },
-      {
-        $set: {
-          userName: req.body.userName,
-          email: req.body.email,
-          password: newPassword,
-          photo: req.body.photo,
-        },
-      },
+      { $set: updateFields },
       { new: true }
     );
+
     const { passwod, ...rest } = updatedUser._doc;
     res.status(200).json(rest);
   } catch (error) {}
