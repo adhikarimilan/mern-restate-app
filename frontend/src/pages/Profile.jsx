@@ -35,12 +35,36 @@ const Profile = () => {
     dispatch(clearError());
   }, []);
 
+  // handling image submit only after photo value is updated
+  useEffect(() => {
+    if (photo) handleImageSubmit();
+  }, [photo]);
+
   const handleChange = (e) => {
     dispatch(clearError());
     setFormData({ ...formData, [e.target.id]: e.target.value });
     console.log({ ...formData, [e.target.id]: e.target.value });
   };
-
+  const handleImageSubmit = async () => {
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ photo: photo }),
+      });
+      const data = await res.json();
+      if (data.success == false) {
+        dispatch(updateUSerError(data.message));
+        return;
+      }
+      dispatch(updsateUserSuccess(data));
+    } catch (error) {
+      dispatch(updateUSerError(error.message));
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData) {
@@ -98,11 +122,8 @@ const Profile = () => {
           console.error(`An error occured while uploading: ${error}`);
         },
         () => {
-          getDownloadURL(uploadFile.snapshot.ref).then((downloadUrl) => {
+          getDownloadURL(uploadFile.snapshot.ref).then(async (downloadUrl) => {
             setPhoto(downloadUrl);
-            setFormData({ ...formData, photo: photo });
-            handleSubmit(event);
-            console.log(downloadUrl);
           });
         }
       );
