@@ -2,7 +2,7 @@ import User from "../models/users.model.js";
 import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 
-export const index = (req, res) => {
+export const index = (req, res, next) => {
   res.json({ message: "hello there" });
 };
 
@@ -53,5 +53,26 @@ export const updateUserInfo = async (req, res, next) => {
 
     const { passwod, ...rest } = updatedUser._doc;
     res.status(200).json(rest);
-  } catch (error) {}
+  } catch (error) {
+    next(errorHandler(500, `An error occured: ${error}`));
+  }
+};
+
+export const deleteUserInfo = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user.id !== req.params.id)
+      return next(errorHandler(401, "You can only update your own details"));
+
+    const deleteUser = await User.findByIdAndDelete(id);
+    if (!deleteUser)
+      next(errorHandler(500, "An error occured while completing your request"));
+
+    res
+      .status(200)
+      .json({ success: true, message: "Account Deletion Successfull!" });
+  } catch (error) {
+    next(errorHandler(500, `An error occured: ${error}`));
+  }
 };
