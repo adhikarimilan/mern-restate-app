@@ -4,12 +4,31 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { MdLogout } from "react-icons/md";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "../redux/User/userSlice";
+import {
+  logoutUser,
+  updateUserError,
+  updateUserStart,
+} from "../redux/User/userSlice";
 
 const Header = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const userLogout = async () => {
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.success === false) dispatch(updateUserError(data.message));
+      dispatch(clearError());
+      dispatch(logoutUser());
+    } catch (error) {
+      dispatch(updateUserError(error));
+    }
     dispatch(logoutUser());
   };
   return (
