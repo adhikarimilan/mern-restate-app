@@ -7,6 +7,7 @@ function Signup() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSucces] = useState(null);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -37,7 +38,7 @@ function Signup() {
       } else {
         setFormData({});
         setError("");
-        navigate("/signup");
+        setSucces(data.message);
       }
       setLoading(false);
     } catch (error) {
@@ -48,6 +49,7 @@ function Signup() {
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7"> Signup</h1>
       {error && <p className="text-red-600 text-md">{error}</p>}
+      {success && <p className="text-blue-700 text-md">{success}</p>}
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -75,7 +77,7 @@ function Signup() {
         />
         <input
           type="submit"
-          value={loading ? "Loading" : "Sign in"}
+          value={loading ? "Loading..." : "Sign up"}
           id="submit"
           onClick={handleSubmit}
           className="border p-3 rounded-lg bg-slate-800 text-white uppercase hover:opacity-90 cursor-pointer disabled:opacity-80"

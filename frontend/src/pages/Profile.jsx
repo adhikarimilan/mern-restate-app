@@ -3,10 +3,11 @@ import { useSelector } from "react-redux";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import {
-  updateUSerError,
+  updateUserError,
   updateUserStart,
-  updsateUserSuccess,
+  updateUserSuccess,
   clearError,
+  logoutUser,
 } from "../redux/User/userSlice.js";
 import {
   getDownloadURL,
@@ -40,6 +41,40 @@ const Profile = () => {
     if (photo) handleImageSubmit();
   }, [photo]);
 
+  const userLogout = async () => {
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.success === false) dispatch(updateUserError(data.message));
+      dispatch(clearError());
+      dispatch(logoutUser());
+    } catch (error) {
+      dispatch(updateUserError(error));
+    }
+  };
+
+  const handleAccountDelete = async () => {
+    try {
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.success === false) dispatch(updateUSerError(data));
+      dispatch(logoutUser());
+    } catch (error) {
+      dispatch(updateUserError(error.message));
+    }
+  };
+
   const handleChange = (e) => {
     dispatch(clearError());
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -57,27 +92,27 @@ const Profile = () => {
       });
       const data = await res.json();
       if (data.success == false) {
-        dispatch(updateUSerError(data.message));
+        dispatch(updateUserError(data.message));
         return;
       }
-      dispatch(updsateUserSuccess(data));
+      dispatch(updateUserSuccess(data));
     } catch (error) {
-      dispatch(updateUSerError(error.message));
+      dispatch(updateUserError(error.message));
     }
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData) {
-      dispatch(updateUSerError("No changes to update"));
+      dispatch(updateUserError("No changes to update"));
       return;
     }
     if (formData.currentPassword) {
       if (!formData.newPassword) {
-        dispatch(updateUSerError("Please Enter your new password Value"));
+        dispatch(updateUserError("Please Enter your new password Value"));
         return;
       }
       if (formData.newPassword !== formData.confirmPassword) {
-        dispatch(updateUSerError("Password Confirmation do not match!"));
+        dispatch(updateUserError("Password Confirmation do not match!"));
         return;
       }
     }
@@ -93,12 +128,12 @@ const Profile = () => {
       });
       const data = await res.json();
       if (data.success == false) {
-        dispatch(updateUSerError(data.message));
+        dispatch(updateUserError(data.message));
         return;
       }
-      dispatch(updsateUserSuccess(data));
+      dispatch(updateUserSuccess(data));
     } catch (error) {
-      dispatch(updateUSerError(error.message));
+      dispatch(updateUserError(error.message));
     }
   };
 
@@ -219,10 +254,18 @@ const Profile = () => {
         />
       </form>
       <div className="flex flex-row justify-between my-2">
-        <span className="text-red-500 cursor-pointer font-bold">
+        <span
+          className="text-red-500 cursor-pointer font-bold hover:opacity-90"
+          onClick={handleAccountDelete}
+        >
           Delete Account
         </span>
-        <span className="text-red-500 cursor-pointer font-bold">Sign Out</span>
+        <span
+          className="text-red-500 cursor-pointer font-bold hover:opacity-90"
+          onClick={userLogout}
+        >
+          Sign Out
+        </span>
       </div>
       <span className="text-center block text-blue-600 font-bold cursor-pointer mx-auto">
         Create New listing

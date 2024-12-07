@@ -12,12 +12,12 @@ import OAuth from "../Components/OAuth";
 function Signin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const { loading, error } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(clearError());
-  }, []);
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -49,7 +49,7 @@ function Signin() {
       if (data.success === false) {
         dispatch(signInError(data.message));
       } else {
-        setFormData({});
+        setFormData({ email: "", password: "" });
         dispatch(signInSuccess(data.userData));
         navigate("/");
       }
