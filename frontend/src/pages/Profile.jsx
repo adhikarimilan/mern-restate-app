@@ -15,6 +15,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { Link } from "react-router-dom";
 import { app } from "../firebase.js";
 
 const Profile = () => {
@@ -246,12 +247,12 @@ const Profile = () => {
           value={loading ? "Loading..." : "upDate"}
           className="border bg-slate-950 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 cursor-pointer text-gray-300 uppercase"
         />
-        <input
-          type="button"
-          id="newListingBtn"
-          value="Add New LiSting"
-          className="border bg-blue-700 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 cursor-pointer text-gray-300 uppercase"
-        />
+
+        <Link to="/create-listing">
+          <span className="border block text-center bg-blue-700 p-3 rounded-lg hover:opacity-90 disabled:opacity-80 cursor-pointer text-gray-300 uppercase">
+            Add New Listing
+          </span>
+        </Link>
       </form>
       <div className="flex flex-row justify-between my-2">
         <span
@@ -267,9 +268,6 @@ const Profile = () => {
           Sign Out
         </span>
       </div>
-      <span className="text-center block text-blue-600 font-bold cursor-pointer mx-auto">
-        Create New listing
-      </span>
     </div>
   );
 };
