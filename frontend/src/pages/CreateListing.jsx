@@ -436,7 +436,7 @@ const CreateListing = () => {
           <button
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
             onClick={handleFormSubmit}
-            disabled={uploading}
+            disabled={uploading || loading}
           >
             {loading ? "Loading" : "Create Listing"}
           </button>

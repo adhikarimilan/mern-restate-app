@@ -60,6 +60,12 @@ const Profile = () => {
     }
   };
 
+  const clearPassword = () => {
+    formData.newPassword = null;
+    formData.currentPassword = null;
+    formData.confirmPassword = null;
+  };
+
   const handleAccountDelete = async () => {
     try {
       const res = await fetch(`/api/user/delete/${currentUser._id}`, {
@@ -133,6 +139,7 @@ const Profile = () => {
         return;
       }
       dispatch(updateUserSuccess(data));
+      clearPassword();
     } catch (error) {
       dispatch(updateUserError(error.message));
     }
@@ -226,6 +233,7 @@ const Profile = () => {
           placeholder="Your Current Password"
           className="border p-3 rounded-lg"
           onChange={handleChange}
+          value={(formData && formData.currentPassword) || ""}
         />
         <input
           type="password"
@@ -233,6 +241,7 @@ const Profile = () => {
           placeholder="Your New Password"
           className="border p-3 rounded-lg"
           onChange={handleChange}
+          value={(formData && formData.newPassword) || ""}
         />
         <input
           type="password"
@@ -240,6 +249,7 @@ const Profile = () => {
           placeholder="Confirm Pasword"
           className="border p-3 rounded-lg"
           onChange={handleChange}
+          value={(formData && formData.confirmPassword) || ""}
         />
         <input
           type="submit"
