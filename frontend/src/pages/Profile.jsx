@@ -146,7 +146,7 @@ const Profile = () => {
       const storageRef = ref(storage, fileName);
       const uploadFile = uploadBytesResumable(storageRef, file);
 
-      console.log(fileName);
+      //console.log(fileName);
       uploadFile.on(
         "state_changed",
         (snapshot) => {
