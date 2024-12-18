@@ -20,13 +20,11 @@ export const getUserListing = async (req, res, next) => {
       return next(errorHandler(401, "you can only view your own listiings"));
 
     const userListings = await Listing.find({ userRef: req.params.id });
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "User listings fetched successfully",
-        data: { ...userListings },
-      });
+    res.status(200).json({
+      success: true,
+      message: "User listings fetched successfully",
+      data: userListings,
+    });
   } catch (error) {
     next(error);
   }

@@ -22,6 +22,11 @@ const Profile = () => {
   const dispatch = useDispatch();
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
+  //user listings
+  const [loadingListing, setLoadingListing] = useState(false);
+  const [errorFetchListing, setErrorFetchListing] = useState(undefined);
+  const [listings, setListings] = useState([]);
+
   const [formData, setFormData] = useState(null);
   const [uploadProgress, setUploadProgress] = useState({});
   const [photo, setPhoto] = useState(null);
@@ -42,6 +47,38 @@ const Profile = () => {
     if (photo) handleImageSubmit();
   }, [photo]);
 
+  useEffect(() => {
+    //if (listings.length) {
+    console.log(listings);
+    console.log(listings.map((listing) => listing));
+  }, [listings]);
+
+  const fetchListings = async () => {
+    try {
+      const res = await fetch(`/api/listing/user/${currentUser._id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setErrorFetchListing(data.message);
+        return;
+      }
+      setErrorFetchListing(undefined);
+      setLoadingListing(false);
+
+      // Convert `data.data` into an array
+      const listingsArray = Object.values(data.data);
+      setListings(data.data);
+    } catch (error) {
+      console.log(`An error occured: ${error}`);
+      setErrorFetchListing(error);
+      setLoadingListing(false);
+    }
+  };
+
   const userLogout = async () => {
     try {
       dispatch(updateUserStart());
@@ -52,7 +89,10 @@ const Profile = () => {
         },
       });
       const data = await res.json();
-      if (data.success === false) dispatch(updateUserError(data.message));
+      if (data.success === false) {
+        dispatch(updateUserError(data.message));
+        return;
+      }
       dispatch(clearError());
       dispatch(logoutUser());
     } catch (error) {
@@ -277,6 +317,44 @@ const Profile = () => {
         >
           Sign Out
         </span>
+      </div>
+      <div className="flex flex-col justify-around items-center w-full gap-2">
+        <button
+          className="text-blue-600 hover:opacity-90 cursor-pointer font-bold my-2"
+          onClick={fetchListings}
+          disabled={loadingListing}
+        >
+          {loadingListing ? "Loading Listing..." : "Show Listing"}
+        </button>
+        {errorFetchListing !== undefined && (
+          <p className="text-red-600 font-bold">{errorFetchListing}</p>
+        )}
+
+        <div>
+          {listings.length > 0 &&
+            listings.map((listing) => (
+              <div className="flex flex-col my-2 max-w-sm" key={listing._id}>
+                <div className="flex flex-row justify-around items-center gap-2">
+                  <img
+                    src={listing.images[0]}
+                    alt="image 1"
+                    className="w-20 h-20"
+                  />
+                  <h3>{listing.name}</h3>
+                  <div className="flex flex-col gap-2 items-center justify-around">
+                    <Link to={`/listing/edit/${listing._id}`}>
+                      <span className="text-slate-700 bg-white p-2 font-bold">
+                        Edit
+                      </span>
+                    </Link>
+                    <span className="text-red-700 bg-white p-2 font-bold cursor-pointer">
+                      Delete
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
