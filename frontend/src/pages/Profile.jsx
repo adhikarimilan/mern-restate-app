@@ -365,7 +365,7 @@ const Profile = () => {
                   />
                   <h3>{listing.name}</h3>
                   <div className="flex flex-col gap-2 items-center justify-around">
-                    <Link to={`/listing/edit/${listing._id}`}>
+                    <Link to={`/edit-listing/${listing._id}`}>
                       <span className="text-slate-700 bg-white p-2 font-bold rounded hover:opacity-90 shadow">
                         Edit
                       </span>

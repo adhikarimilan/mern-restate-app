@@ -14,10 +14,25 @@ export const createListing = async (req, res, next) => {
   }
 };
 
+export const getListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    const { userRef, createdAt, updatedAt, __v, ...rest } = listing._doc;
+    res.status(200).json({
+      success: true,
+      message: "Fetched successfully",
+      listing: rest,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserListing = async (req, res, next) => {
   try {
     if (req.user.id !== req.params.id)
-      return next(errorHandler(401, "you can only view your own listiings"));
+      return next(errorHandler(401, "you can only view your own listings"));
 
     const userListings = await Listing.find({ userRef: req.params.id });
     res.status(200).json({
