@@ -30,11 +30,32 @@ export const getUserListing = async (req, res, next) => {
   }
 };
 
-export const editUserListing = async (req, res, next) => {
+export const updateUserListing = async (req, res, next) => {
   try {
-    if (req.user.id !== req.params.id)
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) return next(errorHandler(404, "Listing not found"));
+
+    if (req.user.id !== listing.userRef)
       return next(errorHandler(401, "You can only edit your own listings"));
-  } catch (error) {}
+
+    const updatedListing = await Listing.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (!updatedListing)
+      return next(errorHandler(500, "An error occured while updating"));
+
+    res.status(201).json({
+      success: true,
+      message: "Successfully updated the listing",
+      listing: updatedListing,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const deleteUserListing = async (req, res, next) => {
