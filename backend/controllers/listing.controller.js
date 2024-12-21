@@ -29,3 +29,26 @@ export const getUserListing = async (req, res, next) => {
     next(error);
   }
 };
+
+export const editUserListing = async (req, res, next) => {
+  try {
+    if (req.user.id !== req.params.id)
+      return next(errorHandler(401, "You can only edit your own listings"));
+  } catch (error) {}
+};
+
+export const deleteUserListing = async (req, res, next) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+
+    if (!listing) return next(errorHandler(404, "Listing not found"));
+    if (req.user.id !== listing.userRef)
+      return next(errorHandler(401, "You can only delete your own listings"));
+
+    const deletelisting = await Listing.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ success: true, message: "Sucessfully deleted" });
+  } catch (error) {
+    next(error);
+  }
+};

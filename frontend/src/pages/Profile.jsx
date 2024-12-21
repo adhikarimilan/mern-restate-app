@@ -49,9 +49,32 @@ const Profile = () => {
 
   useEffect(() => {
     //if (listings.length) {
-    console.log(listings);
-    console.log(listings.map((listing) => listing));
+    // console.log(listings);
+    // console.log(listings.map((listing) => listing));
   }, [listings]);
+
+  const handleListingDelete = async (listingId) => {
+    try {
+      setLoadingListing(true);
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setErrorFetchListing(data.message);
+      }
+      setListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+      setLoadingListing(false);
+    } catch (error) {
+      setErrorFetchListing(error);
+      setLoadingListing(false);
+    }
+  };
 
   const fetchListings = async () => {
     try {
@@ -343,13 +366,18 @@ const Profile = () => {
                   <h3>{listing.name}</h3>
                   <div className="flex flex-col gap-2 items-center justify-around">
                     <Link to={`/listing/edit/${listing._id}`}>
-                      <span className="text-slate-700 bg-white p-2 font-bold">
+                      <span className="text-slate-700 bg-white p-2 font-bold rounded hover:opacity-90 shadow">
                         Edit
                       </span>
                     </Link>
-                    <span className="text-red-700 bg-white p-2 font-bold cursor-pointer">
+
+                    <button
+                      onClick={() => handleListingDelete(listing._id)}
+                      className="text-red-700 bg-white p-2 font-bold cursor-pointer rounded hover:opacity-90 shadow disabled:opacity-80"
+                      disabled={loadingListing}
+                    >
                       Delete
-                    </span>
+                    </button>
                   </div>
                 </div>
               </div>
