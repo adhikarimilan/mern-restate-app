@@ -358,12 +358,16 @@ const Profile = () => {
             listings.map((listing) => (
               <div className="flex flex-col my-2 max-w-sm" key={listing._id}>
                 <div className="flex flex-row justify-around items-center gap-2">
-                  <img
-                    src={listing.images[0]}
-                    alt="image 1"
-                    className="w-20 h-20"
-                  />
-                  <h3>{listing.name}</h3>
+                  <Link to={`/listing/${listing._id}`}>
+                    <img
+                      src={listing.images[0]}
+                      alt="image 1"
+                      className="w-20 h-20"
+                    />
+                  </Link>
+                  <Link to={`/listing/${listing._id}`}>
+                    <h3>{listing.name}</h3>
+                  </Link>
                   <div className="flex flex-col gap-2 items-center justify-around">
                     <Link to={`/edit-listing/${listing._id}`}>
                       <span className="text-slate-700 bg-white p-2 font-bold rounded hover:opacity-90 shadow">

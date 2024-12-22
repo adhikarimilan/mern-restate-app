@@ -6,6 +6,20 @@ export const index = (req, res, next) => {
   res.json({ message: "hello there" });
 };
 
+export const getUserInfo = async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) next(errorHandler(404, "User not found"));
+
+  const { password, createdAt, updatedAt, __v, ...rest } = user._doc;
+
+  res.status(200).json({
+    success: true,
+    message: "User info successfully fetched",
+    user: rest,
+  });
+};
+
 export const updateUserInfo = async (req, res, next) => {
   let newPassword = undefined;
 
