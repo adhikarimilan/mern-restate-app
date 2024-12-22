@@ -18,7 +18,7 @@ export const getListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
 
-    const { userRef, createdAt, updatedAt, __v, ...rest } = listing._doc;
+    const { __v, ...rest } = listing._doc;
     res.status(200).json({
       success: true,
       message: "Fetched successfully",
