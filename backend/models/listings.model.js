@@ -62,5 +62,8 @@ const listingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Create a text index on the `title` and `description` fields
+//listingSchema.index({ name: "text", description: "text" });
+
 const Listing = mongoose.model("Listing", listingSchema);
 export default Listing;

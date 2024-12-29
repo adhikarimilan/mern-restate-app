@@ -52,7 +52,7 @@ const SingleListing = () => {
         return;
       }
       setListing(data.listing);
-      console.log(data);
+      //console.log(data);
       setLoading(false);
     } catch (error) {
       setError(error);
