@@ -5,7 +5,7 @@ export const logout = (req, res, next) => {
     res.clearCookie("access_token");
     res
       .status(200)
-      .json({ success: false, message: "User has been logged out" });
+      .json({ success: true, message: "User has been logged out" });
   } catch (error) {
     next(errorHandler(error));
   }
